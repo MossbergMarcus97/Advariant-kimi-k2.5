@@ -1,9 +1,19 @@
 import type { Config } from 'tailwindcss'
 
 const config: Config = {
+  safelist: [
+    'bg-lime',
+    'text-swiss-black',
+    'text-swiss-text',
+    'text-swiss-muted',
+    'border-swiss-border',
+    'bg-swiss-surface',
+    'bg-swiss-black',
+  ],
   content: [
     './app/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
+    './lib/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
     extend: {

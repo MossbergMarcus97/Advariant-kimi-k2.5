@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 
 const Icons = {
   Logo: () => (
@@ -69,7 +69,22 @@ const navigation = [
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [user, setUser] = useState<any>(null)
   const pathname = usePathname()
+  const router = useRouter()
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('advariant_user')
+    if (storedUser) {
+      setUser(JSON.parse(storedUser))
+    }
+  }, [])
+
+  const handleLogout = () => {
+    localStorage.removeItem('advariant_token')
+    localStorage.removeItem('advariant_user')
+    router.push('/login')
+  }
 
   return (
     <div className="min-h-screen bg-white flex">
@@ -120,14 +135,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-swiss-border">
           <div className="flex items-center gap-3 px-4 py-3">
             <div className="w-8 h-8 bg-swiss-black text-white flex items-center justify-center text-sm font-medium">
-              JD
+              {user?.firstName?.charAt(0) || user?.email?.charAt(0) || 'U'}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">John Doe</p>
-              <p className="text-xs text-swiss-muted truncate">john@company.com</p>
+              <p className="text-sm font-medium truncate">{user?.firstName || user?.email?.split('@')[0] || 'User'}</p>
+              <p className="text-xs text-swiss-muted truncate">{user?.email || ''}</p>
             </div>
           </div>
-          <button className="sidebar-item w-full mt-2">
+          <button onClick={handleLogout} className="sidebar-item w-full mt-2">
             <Icons.Logout />
             <span>Sign out</span>
           </button>

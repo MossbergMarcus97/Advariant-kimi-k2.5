@@ -1,6 +1,9 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { authApi } from '@/lib/api'
 
 const Icons = {
   Sparkles: () => (
@@ -11,52 +14,139 @@ const Icons = {
 }
 
 export default function LoginPage() {
+  const router = useRouter()
+  const [isLogin, setIsLogin] = useState(true)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+
+    try {
+      if (isLogin) {
+        const { token, user } = await authApi.login(email, password)
+        localStorage.setItem('advariant_token', token)
+        localStorage.setItem('advariant_user', JSON.stringify(user))
+        router.push('/dashboard')
+      } else {
+        const { token, user } = await authApi.register(email, password, firstName, lastName)
+        localStorage.setItem('advariant_token', token)
+        localStorage.setItem('advariant_user', JSON.stringify(user))
+        router.push('/dashboard')
+      }
+    } catch (err: any) {
+      setError(err.message || 'Authentication failed')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
-    <div className="min-h-screen bg-white flex">
-      {/* Left side - Form */}
-      <div className="flex-1 flex items-center justify-center p-8">
-        <div className="w-full max-w-sm">
-          <Link href="/" className="flex items-center gap-2 mb-8">
+    <div className="min-h-screen bg-white flex flex-col">
+      {/* Header */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-swiss-border">
+        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2">
             <div className="w-8 h-8 bg-lime flex items-center justify-center">
               <Icons.Sparkles />
             </div>
-            <span className="text-xl font-bold tracking-tight">AdVariant</span>
+            <span className="text-lg font-bold tracking-tight">AdVariant</span>
           </Link>
-
-          <h1 className="text-2xl font-bold mb-2">Welcome back</h1>
-          <p className="text-swiss-muted mb-8">Sign in to your account to continue</p>
-
-          <form className="space-y-4">
-            <div>
-              <label className="text-sm font-medium block mb-1">Email</label>
-              <input type="email" className="input-swiss" placeholder="you@company.com" />
-            </div>
-            <div>
-              <label className="text-sm font-medium block mb-1">Password</label>
-              <input type="password" className="input-swiss" placeholder="••••••••" />
-            </div>
-            <Link href="/dashboard" className="btn-primary w-full text-center block">
-              Sign In
-            </Link>
-          </form>
-
-          <p className="text-center text-sm text-swiss-muted mt-6">
-            Don't have an account?{' '}
-            <a href="#" className="text-swiss-black underline">Sign up</a>
-          </p>
         </div>
-      </div>
+      </header>
 
-      {/* Right side - Visual */}
-      <div className="hidden lg:flex flex-1 bg-swiss-surface items-center justify-center">
-        <div className="text-center p-12">
-          <div className="w-20 h-20 bg-lime flex items-center justify-center mx-auto mb-6">
-            <Icons.Sparkles />
+      {/* Login Form */}
+      <div className="flex-1 flex items-center justify-center pt-16">
+        <div className="w-full max-w-md px-6">
+          <div className="card-swiss p-8">
+            <h1 className="text-headline mb-2">
+              {isLogin ? 'Welcome back' : 'Create account'}
+            </h1>
+            <p className="text-swiss-muted mb-8">
+              {isLogin ? 'Sign in to continue to AdVariant' : 'Get started with AI-powered ad generation'}
+            </p>
+
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 text-sm">
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {!isLogin && (
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-label block mb-2">First Name</label>
+                    <input
+                      type="text"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      className="input-swiss"
+                      placeholder="John"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-label block mb-2">Last Name</label>
+                    <input
+                      type="text"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      className="input-swiss"
+                      placeholder="Doe"
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <label className="text-label block mb-2">Email</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="input-swiss"
+                  placeholder="you@company.com"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="text-label block mb-2">Password</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="input-swiss"
+                  placeholder="••••••••"
+                  required
+                  minLength={8}
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="btn-primary w-full disabled:opacity-50"
+              >
+                {loading ? 'Please wait...' : isLogin ? 'Sign In' : 'Create Account'}
+              </button>
+            </form>
+
+            <div className="mt-6 text-center">
+              <button
+                onClick={() => setIsLogin(!isLogin)}
+                className="text-sm text-swiss-muted hover:text-swiss-black transition-colors"
+              >
+                {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
+              </button>
+            </div>
           </div>
-          <h2 className="text-2xl font-bold mb-2">Generate ads at scale</h2>
-          <p className="text-swiss-muted max-w-xs mx-auto">
-            Create hundreds of on-brand ad variations in minutes with AI
-          </p>
         </div>
       </div>
     </div>

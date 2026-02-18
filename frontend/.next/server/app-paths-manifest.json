@@ -1,10 +1,12 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
+  "/assets/page": "app/assets/page.js",
+  "/clients/new/page": "app/clients/new/page.js",
   "/brand-kits/page": "app/brand-kits/page.js",
-  "/campaigns/new/page": "app/campaigns/new/page.js",
   "/clients/page": "app/clients/page.js",
-  "/campaigns/page": "app/campaigns/page.js",
   "/dashboard/page": "app/dashboard/page.js",
+  "/campaigns/page": "app/campaigns/page.js",
+  "/campaigns/new/page": "app/campaigns/new/page.js",
   "/login/page": "app/login/page.js",
   "/page": "app/page.js",
   "/campaigns/[id]/generate/page": "app/campaigns/[id]/generate/page.js"

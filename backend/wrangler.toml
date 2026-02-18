@@ -1,0 +1,45 @@
+name = "advariant-api"
+main = "src/index.ts"
+compatibility_date = "2024-11-01"
+compatibility_flags = ["nodejs_compat"]
+
+# D1 Database
+[[d1_databases]]
+binding = "DB"
+database_name = "advariant-db"
+database_id = "8ed46547-cd7c-4336-97dc-c152dc4b1dee"
+
+# R2 Buckets - for storing images and assets
+[[r2_buckets]]
+binding = "ASSETS_BUCKET"
+bucket_name = "advariant-assets"
+
+[[r2_buckets]]
+binding = "GENERATIONS_BUCKET"
+bucket_name = "advariant-generations"
+
+# KV Namespaces - for sessions and rate limiting
+[[kv_namespaces]]
+binding = "SESSIONS"
+id = "67a5b763a8754a1fa652450d76ce15d3"
+
+[[kv_namespaces]]
+binding = "RATE_LIMIT"
+id = "34d5ddf57cd7406f90d9ea04bcafd63d"
+
+# Environment variables (use wrangler secret for sensitive values)
+[vars]
+ENVIRONMENT = "production"
+
+# Routes (custom domain)
+# [[routes]]
+# pattern = "api.advariant.io/*"
+# custom_domain = true
+
+# Build configuration
+[build]
+command = ""
+
+# Development settings
+[dev]
+port = 8787
